@@ -2,6 +2,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 import express, {Application, Request, Response, NextFunction} from 'express';
 import cors from 'cors';
+import { initializeRedis, closeRedis } from './db/redis';
+
 import usersRouter from './routes/usersRoutes';
 import moviesRouter from './routes/moviesRoutes';
 import ratingsRouter from './routes/ratingsRoutes';
@@ -38,16 +40,40 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
     });
 });
 
-  app.use('*', (req: Request, res: Response) => {
+app.use('*', (req: Request, res: Response) => {
     res.status(404).json({ 
       error: 'Endpoint not found',
       path: req.originalUrl 
     });
 });
 
-if (require.main === module || process.env.PLAYWRIGHT) {
+const startServer = async () => {
+  try {
+    await initializeRedis();
     const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3001;
-    app.listen(PORT, () => console.log(`Server running on port: ${PORT}`));
+    app.listen(PORT, () => {
+      console.log(`Server running on port: ${PORT}`);
+    })
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1)
+  }
+}
+
+process.on('SIGTERM', async () => {
+  console.log('SIGTERM received, shutting down gracefully');
+  await closeRedis();
+  process.exit(0);
+})
+
+process.on('SIGINT', async () => {
+  console.log('SIGINT received, shutting down gracefully');
+  await closeRedis();
+  process.exit(0);
+});
+
+if (require.main === module || process.env.PLAYWRIGHT) {
+  startServer();
 }
 
 export default app;
