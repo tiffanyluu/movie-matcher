@@ -1,0 +1,42 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "vitest.config.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "tsx src/server.ts",
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "db:setup": "tsx src/db/setup.ts",
+    "db:seed": "tsx src/db/seed.ts",
+    "db:reset": "npm run db:setup && npm run db:seed",
+    "setup": "npm run db:reset"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
+    "csv-parser": "^3.2.0",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.16.3",
+    "tsx": "^4.20.5"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^24.3.0",
+    "@types/pg": "^8.15.5",
+    "supertest": "^7.1.4",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  }
+}
