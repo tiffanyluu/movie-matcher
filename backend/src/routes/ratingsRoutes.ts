@@ -2,6 +2,7 @@ import express, {Request, Response} from 'express';
 import pool from '../db';
 import {authenticateToken} from './usersRoutes';
 import { RateMovieRequest, RatingResponse } from '../types';
+import { invalidateUserCache } from '../services/recommendationService';
 
 const router = express.Router();
 
@@ -23,6 +24,7 @@ router.post('/', authenticateToken, async (req: Request, res: Response) => {
             ON CONFLICT (user_id, movie_id) DO UPDATE SET rating = $3, timestamp = NOW()`,
             [userId, movieId, rating]
         )
+        await invalidateUserCache(userId);
         res.json({success: true})
     } catch (err: unknown) {
       console.error('Rate movie error:', err);

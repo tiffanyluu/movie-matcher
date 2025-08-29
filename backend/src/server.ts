@@ -7,6 +7,7 @@ import { initializeRedis, closeRedis } from './db/redis';
 import usersRouter from './routes/usersRoutes';
 import moviesRouter from './routes/moviesRoutes';
 import ratingsRouter from './routes/ratingsRoutes';
+import recommendationsRouter from './routes/recommendationsRoutes';
 
 const app: Application = express();
 
@@ -22,6 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/users', usersRouter);
 app.use('/movies', moviesRouter);
 app.use('/ratings', ratingsRouter);
+app.use('/recommendations', recommendationsRouter);
 
 app.get('/health', (_req: Request, res: Response) => {
     res.json({ 
@@ -40,7 +42,7 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
     });
 });
 
-app.use('*', (req: Request, res: Response) => {
+app.use((req: Request, res: Response) => {
     res.status(404).json({ 
       error: 'Endpoint not found',
       path: req.originalUrl 
