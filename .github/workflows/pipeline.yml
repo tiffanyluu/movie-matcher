@@ -1,3 +1,4 @@
+# .github/workflows/ci.yml
 name: CI/CD Pipeline
 on:
   push:
@@ -29,7 +30,7 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_PASSWORD: ci_test_pass_2024
           POSTGRES_DB: moviematcher
         options: >-
           --health-cmd pg_isready
@@ -55,8 +56,10 @@ jobs:
           node-version: lts/*
       - name: Install dependencies
         run: |
-          cd backend && npm ci
-          cd frontend && npm ci
+          cd backend
+          npm ci
+          cd ../frontend
+          npm ci
       - name: Setup database
         run: |
           cd backend
