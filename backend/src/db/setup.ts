@@ -66,7 +66,7 @@ const setupDatabase = async () => {
         user_id INT REFERENCES users(id),
         movie_id INT REFERENCES movies(id),
         rating INT CHECK (rating = 0 OR rating = 1),
-        timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+        timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         UNIQUE(user_id, movie_id)
         );
     `);
