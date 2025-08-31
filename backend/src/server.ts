@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 dotenv.config();
+
 import express, {Application, Request, Response, NextFunction} from 'express';
 import cors from 'cors';
 import { initializeRedis, closeRedis } from './db/redis';
@@ -19,7 +20,6 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
 app.use('/users', usersRouter);
 app.use('/movies', moviesRouter);
 app.use('/ratings', ratingsRouter);
@@ -32,7 +32,6 @@ app.get('/health', (_req: Request, res: Response) => {
       environment: process.env.NODE_ENV || 'development'
     });
 });
-
 
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
     console.error('Unhandled error:', err);
@@ -55,6 +54,9 @@ const startServer = async () => {
     const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3001;
     app.listen(PORT, () => {
       console.log(`Server running on port: ${PORT}`);
+      if (process.env.NODE_ENV === 'test') {
+        console.log('🧪 Test mode active - using mocked database and Redis');
+      }
     })
   } catch (error) {
     console.error('Failed to start server:', error);
