@@ -1,0 +1,90 @@
+name: CI/CD Pipeline
+on:
+  push:
+    branches: [main]
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          npm ci
+      - name: Run backend tests
+        run: |
+          cd backend
+          npm run test:run
+
+  e2e-tests:
+    runs-on: ubuntu-latest
+    needs: [backend-tests]
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: moviematcher
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+      - name: Install dependencies
+        run: |
+          cd backend && npm ci
+          cd frontend && npm ci
+      - name: Setup database
+        run: |
+          cd backend
+          npm run db:setup
+          npm run db:seed
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/moviematcher
+          REDIS_URL: redis://localhost:6379
+      - name: Install Playwright browsers
+        run: |
+          cd frontend
+          npx playwright install --with-deps
+      - name: Run E2E tests
+        run: |
+          cd frontend
+          npx playwright test
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/moviematcher
+          REDIS_URL: redis://localhost:6379
+          JWT_SECRET: test-secret
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [backend-tests, e2e-tests]
+    if: success()
+    steps:
+      - name: All tests passed - Ready for deployment
+        run: |
+          echo "Backend tests: ✓"
+          echo "E2E tests: ✓"
+          echo "Ready for AWS deployment"
