@@ -83,54 +83,37 @@ test.describe('Complete User Journey', () => {
   });
 
   test('authentication flow works correctly', async ({ page }) => {
-    // 1. LOGIN WITH EXISTING USER
-    await page.goto('/login');
+    // Generate unique email for this test
+    const uniqueEmail = `auth-test-${Date.now()}@example.com`;
+    const userName = 'Auth Test User';
     
-    await page.fill('input[name="email"]', 'test@example.com');
+    // 1. CREATE USER FIRST
+    await page.goto('/signup');
+    await page.fill('input[name="name"]', userName);
+    await page.fill('input[name="email"]', uniqueEmail);
+    await page.fill('input[name="password"]', 'password123');
+    await page.click('button[type="submit"]');
+    await page.waitForURL('/dashboard');
+    
+    // Verify we can access protected routes while logged in
+    await page.goto('/movies');
+    await expect(page).toHaveURL('/movies');
+    
+    // 2. LOGOUT
+    await page.goto('/dashboard'); // Go back to dashboard first
+    await page.click('button:has-text("Logout")');
+    await page.waitForURL('/login');
+    
+    // 3. LOGIN WITH CREATED USER  
+    await page.fill('input[name="email"]', uniqueEmail);
     await page.fill('input[name="password"]', 'password123');
     await page.click('button[type="submit"]');
     
     // Should redirect to dashboard
-    await expect(page).toHaveURL('/dashboard');
+    await page.waitForURL('/dashboard', { timeout: 10000 });
     
-    // 2. PROTECTED ROUTES
-    // Should be able to access protected pages
+    // 4. VERIFY PROTECTED ROUTES WORK AFTER LOGIN
     await page.goto('/movies');
     await expect(page).toHaveURL('/movies');
-    
-    // 3. LOGOUT (if you have logout functionality)
-    // This would depend on how you implemented logout
-    // await page.click('text=Logout');
-    // await expect(page).toHaveURL('/login');
   });
-
-  // test('handles errors gracefully', async ({ page }) => {
-  //   // Test signup with existing email
-  //   await page.goto('/signup');
-    
-  //   await page.fill('input[name="name"]', 'Test User');
-  //   await page.fill('input[name="email"]', 'test@example.com'); // Already exists in mock data
-  //   await page.fill('input[name="password"]', 'password123');
-    
-  //   await page.click('button[type="submit"]');
-    
-  //   // Should show exact error message from backend
-  //   await expect(page.locator('text=Email exists.')).toBeVisible();
-    
-  //   // Test invalid login
-  //   await page.goto('/login');
-    
-  //   await page.fill('input[name="email"]', 'wrong@example.com');
-  //   await page.fill('input[name="password"]', 'wrongpassword');
-  //   await page.click('button[type="submit"]');
-    
-  //   // Wait for the API call to complete and error to be processed
-  //   await page.waitForTimeout(2000);
-    
-  //   // Check that we're still on the login page (didn't redirect)
-  //   await expect(page).toHaveURL('/login');
-    
-  //   // And check for any error div with red text
-  //   await expect(page.locator('div.text-red-600')).toBeVisible();
-  // });
 });
