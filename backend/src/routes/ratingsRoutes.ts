@@ -25,6 +25,8 @@ router.post('/', authenticateToken, async (req: Request, res: Response) => {
             [userId, movieId, rating]
         )
         await invalidateUserCache(userId);
+        console.log(`🗑️ Cache invalidated for user ${userId}`);
+
         res.json({success: true})
     } catch (err: unknown) {
       console.error('Rate movie error:', err);

@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary-50: oklch(0.97 0.013 238.36);
+  --color-primary-100: oklch(0.93 0.027 240.01);
+  --color-primary-200: oklch(0.86 0.055 241.45);
+  --color-primary-300: oklch(0.78 0.085 242.96);
+  --color-primary-400: oklch(0.69 0.116 244.64);
+  --color-primary-500: oklch(0.61 0.148 246.06);
+  --color-primary-600: oklch(0.53 0.179 247.89);
+  --color-primary-700: oklch(0.45 0.208 249.27);
+  --color-primary-800: oklch(0.37 0.169 251.26);
+  --color-primary-900: oklch(0.31 0.135 252.83);
+  --color-primary-950: oklch(0.20 0.088 254.04);
+}
+
+@layer base {
+  html {
+    font-family: system-ui, sans-serif;
+  }
+  
+  body {
+    @apply bg-gray-50 text-gray-900;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  .btn-secondary {
+    @apply bg-gray-200 hover:bg-gray-300 text-gray-900 font-medium py-2 px-4 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  .input-field {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+  }
+  
+  .card {
+    @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6;
+  }
+  
+  .movie-card {
+    @apply bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow duration-200 cursor-pointer;
+  }
+}
