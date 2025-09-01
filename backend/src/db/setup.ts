@@ -1,15 +1,21 @@
 import { Pool } from 'pg';
 import dotenv from 'dotenv';
-dotenv.config();
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config();
+}
+
 
 const setupDatabase = async () => {
-  const defaultPool = new Pool({
-    host: process.env.DB_HOST || 'localhost',
-    port: Number(process.env.DB_PORT) || 5432,
-    user: process.env.DB_USER || 'tiffanyluu',
-    password: process.env.DB_PASSWORD || '',
-    database: process.env.DEFAULT_DB || 'tiffanyluu'
-  });
+  const connectionConfig = process.env.DATABASE_URL ? 
+    { connectionString: process.env.DATABASE_URL } : 
+    {
+      host: process.env.DB_HOST || 'localhost',
+      port: Number(process.env.DB_PORT) || 5432,
+      user: process.env.DB_USER || 'tiffanyluu',
+      password: process.env.DB_PASSWORD || '',
+      database: process.env.DEFAULT_DB || 'tiffanyluu'
+    };
+  const defaultPool = new Pool(connectionConfig);
 
   let appPool: Pool | null = null;
 

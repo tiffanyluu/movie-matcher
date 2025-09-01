@@ -1,7 +1,12 @@
 import fs from 'fs';
 import path from 'path';
 import csv from 'csv-parser';
-import pool from './index'
+import { Pool } from 'pg';
+import dotenv from 'dotenv';
+
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config();
+}
 
 const seedMovies = async () => {
   const csvFilePath = path.join(__dirname, 'sampled.csv');
@@ -24,6 +29,11 @@ const seedMovies = async () => {
 
   console.log(`Seeding ${movies.length} movies...`);
 
+  const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  });
+
   const client = await pool.connect();
   try {
     for (const movie of movies) {
@@ -41,6 +51,7 @@ const seedMovies = async () => {
     }
   } finally {
     client.release();
+    await pool.end();
   }
 };
 
