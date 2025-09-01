@@ -10,7 +10,7 @@ import type {
 } from '../types';
 
 const API_BASE_URL = import.meta.env.PROD 
-  ? 'https://your-aws-api-url.com'
+  ? 'https://movie-matcher-backend-bx87.onrender.com'
   : '/api';
 
 const api = axios.create({
