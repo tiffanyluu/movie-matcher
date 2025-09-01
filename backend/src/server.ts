@@ -4,8 +4,6 @@ dotenv.config();
 import express, {Application, Request, Response, NextFunction} from 'express';
 import cors from 'cors';
 import { initializeRedis, closeRedis } from './db/redis';
-import { setupDatabase } from './db/setup';
-import { seedMovies } from './db/seed';
 
 import usersRouter from './routes/usersRoutes';
 import moviesRouter from './routes/moviesRoutes';
@@ -21,16 +19,6 @@ app.use(cors({
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-app.get('/setup-production', async (_req, res) => {
-  try {
-    await setupDatabase();
-    await seedMovies();
-    res.json({ success: true, message: 'Database setup complete' });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
 
 app.use('/users', usersRouter);
 app.use('/movies', moviesRouter);

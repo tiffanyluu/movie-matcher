@@ -1,58 +1,10 @@
-import { Pool } from 'pg';
-import dotenv from 'dotenv';
-if (process.env.NODE_ENV !== 'production') {
-  dotenv.config();
-}
+import pool from "./index";
 
-
-const setupDatabase = async () => {
-  const connectionConfig = process.env.NODE_ENV === 'production' ? {
-    host: 'db.gepmolswcdbjckzyqiyj.supabase.co',
-    port: 5432,
-    user: 'postgres',
-    password: 'ZPwYCYYFaWkFLjlH',
-    database: 'postgres',
-    ssl: { rejectUnauthorized: false }
-  } : {
-    host: process.env.DB_HOST || 'localhost',
-    port: Number(process.env.DB_PORT) || 5432,
-    user: process.env.DB_USER || 'tiffanyluu',
-    password: process.env.DB_PASSWORD || '',
-    database: process.env.DEFAULT_DB || 'tiffanyluu'
-  };
-  
-  const defaultPool = new Pool(connectionConfig);
-
-  let appPool: Pool | null = null;
-
+export const setupDatabase = async () => {
   try {
-    console.log('Setting up database and tables...');
+    console.log("Creating tables...");
 
-    console.log('Creating database moviematcher...');
-    try {
-      await defaultPool.query('CREATE DATABASE moviematcher;');
-      console.log('Database created!');
-    } catch (error: any) {
-      if (error.code === '42P04') {
-        console.log('Database already exists, continuing...');
-      } else {
-        throw error;
-      }
-    }
-
-    await defaultPool.end();
-
-    appPool = new Pool({
-      host: process.env.DB_HOST || 'localhost',
-      port: Number(process.env.DB_PORT) || 5432,
-      user: process.env.DB_USER || 'tiffanyluu',
-      password: process.env.DB_PASSWORD || '',
-      database: 'moviematcher'
-    });
-
-    console.log('Creating tables...');
-
-    await appPool.query(`
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
         name VARCHAR(100) NOT NULL,
@@ -62,7 +14,7 @@ const setupDatabase = async () => {
       );
     `);
 
-    await appPool.query(`
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS movies (
         id SERIAL PRIMARY KEY,
         title VARCHAR(255) NOT NULL,
@@ -72,50 +24,40 @@ const setupDatabase = async () => {
       );
     `);
 
-    await appPool.query(`
-        CREATE TABLE IF NOT EXISTS ratings (
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS ratings (
         id SERIAL PRIMARY KEY,
         user_id INT REFERENCES users(id),
         movie_id INT REFERENCES movies(id),
-        rating INT CHECK (rating = 0 OR rating = 1),
+        rating INT CHECK (rating IN (0, 1)),
         timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         UNIQUE(user_id, movie_id)
-        );
+      );
     `);
-  
 
-    console.log('Creating indexes for performance...');
-    await appPool.query(`CREATE INDEX IF NOT EXISTS idx_ratings_user ON ratings(user_id);`);
-    await appPool.query(`CREATE INDEX IF NOT EXISTS idx_ratings_movie ON ratings(movie_id);`);
+    console.log("Creating indexes...");
+    await pool.query(
+      `CREATE INDEX IF NOT EXISTS idx_ratings_user ON ratings(user_id);`
+    );
+    await pool.query(
+      `CREATE INDEX IF NOT EXISTS idx_ratings_movie ON ratings(movie_id);`
+    );
 
-    console.log('Database setup complete!');
-    console.log('Tables created:');
-    console.log('   - users');
-    console.log('   - movies');
-    console.log('   - ratings');
-    console.log('Ready to run: npm run seed-movies');
-
+    console.log("✅ Database setup complete!");
   } catch (error) {
-    console.error('Database setup failed:', error);
+    console.error("Database setup failed:", error);
     throw error;
-  } finally {
-    if (appPool) {
-      await appPool.end();
-    }
   }
 };
 
-// Run if this file is executed directly
 if (require.main === module) {
   setupDatabase()
     .then(() => {
-      console.log('Database setup completed successfully!');
+      console.log("Setup finished successfully.");
       process.exit(0);
     })
-    .catch((error) => {
-      console.error('Setup failed:', error);
+    .catch((err) => {
+      console.error(err);
       process.exit(1);
     });
 }
-
-export { setupDatabase };
