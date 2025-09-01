@@ -29,10 +29,19 @@ const seedMovies = async () => {
 
   console.log(`Seeding ${movies.length} movies...`);
 
-  const pool = new Pool({
+  const connectionConfig = process.env.NODE_ENV === 'production' ? {
+    host: 'db.gepmolswcdbjckzyqiyj.supabase.co',
+    port: 5432,
+    user: 'postgres',
+    password: 'ZPwYCYYFaWkFLjlH',
+    database: 'postgres',
+    ssl: { rejectUnauthorized: false }
+  } : {
     connectionString: process.env.DATABASE_URL,
-    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
-  });
+    ssl: false
+  };
+
+  const pool = new Pool(connectionConfig);
 
   const client = await pool.connect();
   try {

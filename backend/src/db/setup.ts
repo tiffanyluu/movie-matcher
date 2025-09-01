@@ -6,15 +6,21 @@ if (process.env.NODE_ENV !== 'production') {
 
 
 const setupDatabase = async () => {
-  const connectionConfig = process.env.DATABASE_URL ? 
-    { connectionString: process.env.DATABASE_URL } : 
-    {
-      host: process.env.DB_HOST || 'localhost',
-      port: Number(process.env.DB_PORT) || 5432,
-      user: process.env.DB_USER || 'tiffanyluu',
-      password: process.env.DB_PASSWORD || '',
-      database: process.env.DEFAULT_DB || 'tiffanyluu'
-    };
+  const connectionConfig = process.env.NODE_ENV === 'production' ? {
+    host: 'db.gepmolswcdbjckzyqiyj.supabase.co',
+    port: 5432,
+    user: 'postgres',
+    password: 'ZPwYCYYFaWkFLjlH',
+    database: 'postgres',
+    ssl: { rejectUnauthorized: false }
+  } : {
+    host: process.env.DB_HOST || 'localhost',
+    port: Number(process.env.DB_PORT) || 5432,
+    user: process.env.DB_USER || 'tiffanyluu',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DEFAULT_DB || 'tiffanyluu'
+  };
+  
   const defaultPool = new Pool(connectionConfig);
 
   let appPool: Pool | null = null;
