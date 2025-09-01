@@ -4,7 +4,7 @@ MovieMatcher is a movie recommendation system that uses **machine learning algor
 It combines user rating patterns with genre preferences using ML techniques to generate accurate recommendations with explanations in under 2ms.
 
 <p align="center">
- <img src="images/pic.png" alt="moviematcher homepage"/>
+  <img src="images/pic.png" alt="moviematcher homepage" width="400"/>
 </p>
 
 ## **Live Demo:** [MovieMatcher](https://movie-matcher-tiffany.vercel.app/)
