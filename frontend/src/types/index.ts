@@ -1,4 +1,3 @@
-// User types
 export interface User {
     id: number;
     name: string;
@@ -10,7 +9,6 @@ export interface User {
     email?: string;
   }
   
-  // Auth types
   export interface SignupRequest {
     name: string;
     email: string;
@@ -27,7 +25,6 @@ export interface User {
     token: string;
   }
   
-  // Movie types
   export interface Movie {
     id: number;
     title: string;
@@ -35,14 +32,9 @@ export interface User {
     description: string;
   }
   
-  export interface MovieWithRating extends Movie {
-    userRating?: number;
-  }
-  
-  // Rating types
   export interface RateMovieRequest {
     movieId: number;
-    rating: number; // 0 or 1
+    rating: number;
   }
   
   export interface Rating {
@@ -50,7 +42,6 @@ export interface User {
     rating: number;
   }
   
-  // Recommendation types
   export interface Recommendation extends Movie {
     explanation: string;
   }
@@ -62,13 +53,6 @@ export interface User {
     timestamp: string;
   }
   
-  // API Error type
-  export interface ApiError {
-    error: string;
-    message?: string;
-  }
-  
-  // Context types
   export interface AuthContextType {
     user: User | null;
     token: string | null;
@@ -80,7 +64,6 @@ export interface User {
     invalidateRecommendations: () => void;
   }
   
-  // Component prop types
   export interface ProtectedRouteProps {
     children: React.ReactNode;
   }
